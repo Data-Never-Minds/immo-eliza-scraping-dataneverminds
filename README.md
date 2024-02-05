@@ -19,11 +19,11 @@ The program does the following:
     2. Wraps API in an interactive application
 
 ## Installation
-Open ```cmd``` on windows or ```terminal``` on mac.
-Move into the directory where you want to download the project files. 
+Open ```cmd``` on windows or ```terminal``` on mac.\
+Move into the directory where you want to download the project files.\
 ```git clone git@github.com:Data-Never-Minds/immo-eliza-scraping-dataneverminds```
 
-Open ```cmd``` if on windows and move into the immo-eliza-scraping-dataneverminds directory.
+Open ```cmd``` if on windows and move into the immo-eliza-scraping-dataneverminds directory.\
 ```cd immo-eliza-scraping-dataneverminds```
 
 ## Usage
