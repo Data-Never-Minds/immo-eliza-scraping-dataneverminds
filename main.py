@@ -23,3 +23,6 @@ for x in range(1, 2):
 for url in url_list:
     print(get_link(url).find_all('tr', attrs={
           "class": 'classified-table__row'}))
+
+
+print("JUST TESTING THIS")
