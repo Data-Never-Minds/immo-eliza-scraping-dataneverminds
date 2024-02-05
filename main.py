@@ -2,14 +2,20 @@ from bs4 import BeautifulSoup
 import requests
 import time
 import threading
+import pandas as pd
 
 url_list = []
+
+
+def to_csv(data: dict, save='.data.csv'):
+    dataframe = pd.DataFrame(data)
+    dataframe.to_csv(save, index=False)
 
 
 def get_link(url):
 
     r = requests.get(url)
-    soup = BeautifulSoup(r.content, "lxml")
+    soup = BeautifulSoup(r.content, "html-parse")
 
     return soup
 
@@ -20,9 +26,11 @@ for x in range(1, 2):
         url_list.append(a.get("href"))
 
 
-for url in url_list:
-    print(get_link(url).find_all('tr', attrs={
-          "class": 'classified-table__row'}))
-
-
-print("JUST TESTING THIS")
+data = get_link(url_list[0]).find_all(
+    'div', attrs={"class": 'accordion__content'})
+print(data)
+# for x in data:
+#   teste_1 = x.find(
+#      'th', attrs={"class": 'classified-table__header'})
+# print(teste_1)
+# print(x.find('td', attrs={"class": 'classified-table__data'}).content)
