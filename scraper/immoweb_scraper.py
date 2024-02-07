@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
 from .utils import get_soup
 import time
@@ -31,9 +31,37 @@ def get_property_details(url):
             return results
 
 
+def get_links_concurrently(base_url, pages=15):
+    """Fetch property links from multiple pages concurrently."""
+    def fetch_links_from_page(page_number):
+        """Function to fetch links from a single page."""
+        page_url = base_url.format(page_number)
+        soup = get_soup(page_url)
+        links = [a.get("href") for a in soup.find_all(
+            'a', attrs={"class": "card__title-link"})]
+        return links
+
+    url_list = []
+    with ThreadPoolExecutor(max_workers=5) as executor:
+        # Submit all pages to be fetched concurrently
+        future_to_page = {executor.submit(
+            fetch_links_from_page, page): page for page in range(1, pages + 1)}
+
+        for future in as_completed(future_to_page):
+            page = future_to_page[future]
+            try:
+                page_links = future.result()
+                url_list.extend(page_links)
+                print(f"Extracted URLs from Page {page}")
+            except Exception as exc:
+                print(f"Page {page} generated an exception: {exc}")
+
+    return url_list
+
+
 def fetch_details_concurrently(url_list):
     """Fetch property details for a list of URLs concurrently."""
-    with ThreadPoolExecutor(max_workers=1000) as executor:
+    with ThreadPoolExecutor(max_workers=10000) as executor:
         start = time.time()
         futures = {executor.submit(
             get_property_details, url): url for url in url_list}

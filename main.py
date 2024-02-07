@@ -1,16 +1,17 @@
 from bs4 import BeautifulSoup
 import requests
 import json
-from scraper.immoweb_scraper import get_links, fetch_details_concurrently
+from scraper.immoweb_scraper import get_links, fetch_details_concurrently, get_links_concurrently
 from scraper.utils import to_csv
 import time
 
 
 def main():
+    starttimer = time.time()
     base_url = 'https://www.immoweb.be/en/search/house/for-sale?countries=BE&page={}&orderBy=relevance'
 
     # Fetch property links
-    url_list = get_links(base_url, pages=30)
+    url_list = get_links_concurrently(base_url, pages=333)
 
     # Fetch details concurrently for the collected URLs
     print("Fetching details for collected properties...")
@@ -45,6 +46,9 @@ def main():
     # Save the collected data to CSV
     to_csv(all_property_data, 'property_data.csv')
     print("Results saved to property_data.csv")
+
+    endtimer = time.time()
+    print("TIME GERAL: {:.6f}m".format((endtimer - starttimer)/60))
 
 
 if __name__ == "__main__":
