@@ -1,3 +1,10 @@
 venv/
 __pycache__/
 *.pyc
+Eliza/
+get_details
+immodetails.ipynb
+immogetdetails.ipynb
+immosel.ipynb
+notes.json
+page1
