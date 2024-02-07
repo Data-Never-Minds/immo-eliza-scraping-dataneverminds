@@ -24,27 +24,36 @@ def to_csv(data: list, save='data.csv') -> None:
 def process_property_detail(detail):
     """Process a single property detail and return a dictionary with all relevant fields."""
     if detail:
-        property_dict = {
-            "Property ID": detail.get('id', 'N/A'),
-            "Locality name": detail['property'].get('location', {}).get('locality', 'N/A'),
-            "Postal code": detail['property'].get('location', {}).get('postalCode', 'N/A'),
-            "Living area": detail['property'].get('netHabitableSurface', 'N/A'),
-            "Number of Rooms": detail['property'].get('bedroomCount', 'N/A'),
-            "Price": detail['transaction'].get('sale', {}).get('price', 'N/A'),
-            "Type of property": detail['property'].get('type', 'N/A'),
-            "Subtype of property": detail['property'].get('subtype', 'N/A'),
-            "Type of sale": 'N/A' if detail['transaction'].get('subtype', '') == 'LIFE_SALE' else detail['transaction'].get('subtype', 'N/A'),
-            "Furnished": 1 if detail['transaction'].get('sale', {}).get('isFurnished', False) else 0,
-            "Open fire": 1 if detail['property'].get('fireplaceExists', False) else 0,
-            "Terrace": f"{detail['property'].get('terraceSurface', 'None')}m²" if detail['property'].get('terraceSurface', False) else 'None',
-            "Garden": f"{detail['property'].get('gardenSurface', 'None')}m²" if detail['property'].get('gardenSurface', False) else 'None',
-            "Swimming pool": 1 if detail['property'].get('hasSwimmingPool', False) else 0,
-        }
-        return property_dict
+        property_type = detail['property'].get('type')
+        if property_type != 'HOUSE_GROUP':
+            if property_type != 'APARTMENT_GROUP':
+
+                property_dict = {
+                    "Property ID": detail['id'],
+                    "Locality name": detail['property'].get('location', {}).get('locality', 'null'),
+                    "Postal code": detail['property'].get('location', {}).get('postalCode', '0'),
+                    "Price": f"{detail['transaction'].get('sale', {}).get('price')}" if detail['transaction'].get('sale', {}).get('price') else 0,
+                    "Type of property": detail['property'].get('type', 'N/A'),
+                    "Subtype of property": detail['property'].get('subtype', 'N/A'),
+                    "Type of sale": "N/A" if detail['transaction'].get('subtype', '') == 'LIFE_SALE' else detail['transaction'].get('subtype', 'N/A'),
+                    "Number of Rooms": f"{detail['property'].get('bedroomCount', '0')}" if detail['property'].get('bedroomCount', '0') else 0,
+                    "Living area": f"{detail['property'].get('netHabitableSurface', '0')}" if detail['property'].get('netHabitableSurface', '0') else 0,
+                    "Furnished": 1 if detail['transaction'].get('sale', {}).get('isFurnished', False) else 0,
+                    "Open fire": 1 if detail['property'].get('fireplaceExists', False) else 0,
+                    "Terrace Surface": f"{detail['property'].get('terraceSurface', 'null')}" if detail['property'].get('terraceSurface', False) else 0,
+                    "Garden Surface": f"{detail['property'].get('gardenSurface', 'null')}" if detail['property'].get('gardenSurface', False) else 0,
+                    "Swimming pool": 1 if detail['property'].get('hasSwimmingPool', False) else 0,
+                    "Kitchen": 1 if detail['property'].get('kitchen') else 0,
+                    "Toilets": detail['property']['toiletCount'],
+                    "Number of facades": detail['property'].get('building', {}).get('facadeCount', 0) if detail['property'].get('building') else 0,
+                    "Building State": detail['property'].get('building', {}).get('condition') if detail['property'].get('building') and detail['property']['building'].get('condition') else 'None'
+                }
+                # If not 'GROUP_HOUSE', add the details to all_property_data
+                return property_dict
     return None
 
 
-def process_details_concurrently(property_details_list, max_workers=15):
+def process_details_concurrently(property_details_list, max_workers=16):
     """Process property details concurrently using threading."""
     all_property_data = []
 
