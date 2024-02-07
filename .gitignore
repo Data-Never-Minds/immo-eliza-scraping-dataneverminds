@@ -1,4 +1,6 @@
 venv/
+__pycache__/
+*.pyc
 Eliza/
 get_details
 immodetails.ipynb

@@ -1,87 +1,50 @@
-import requests
-from bs4 import BeautifulSoup
-import json
+from scraper.immoweb_scraper import get_links, fetch_details_concurrently
+from scraper.utils import to_csv
+import time
 
-url = "https://www.immoweb.be/fr/annonce/maison/a-vendre/ixelles/1050/11075842"
-r = requests.get(url)
-c = r.content
-#print(r.status_code)
 
-soup = BeautifulSoup(c, "html.parser")
+def main():
+    base_url = 'https://www.immoweb.be/en/search/house/for-sale?countries=BE&page={}&orderBy=relevance'
 
-script_tags = soup.find_all("script", attrs={"type": "text/javascript"})
+    # Fetch property links
+    url_list = get_links(base_url, pages=2)  
 
-for script in script_tags:
-    if "window.classified" in script.get_text():
-        script_text = script.get_text()
-        json_string = script_text.split('window.classified = ', 1)[1]
-        json_string = json_string.rsplit(';', 1)[0]
+    # Fetch details concurrently for the collected URLs
+    print("Fetching details for collected properties...")
+    property_details_list = fetch_details_concurrently(url_list)
+  
+    # Print details for each property and collect data for CSV
+    all_property_data = []  # List to collect all property data
+    for details in property_details_list:
+        if details:  # Ensure details were fetched successfully
+            print("Property ID:", details['id'])
+            print("Locality name:", details['property'].get('location', {}).get('locality', 'N/A'))
+            print("Postal code:", details['property'].get('location', {}).get('postalCode', 'N/A'))
+            print("Living area:", details['property'].get('netHabitableSurface', 'N/A'))
+            print("Number of Rooms:", details['property'].get('bedroomCount', 'N/A'))
+            print("Price:", details['transaction'].get('sale', {}).get('price', 'N/A'))
+            print("Type of property:", details['property'].get('type', 'N/A'))
+            print("Subtype of property:", details['property'].get('subtype', 'N/A'))
+            print("Type of sale:", "N/A" if details['transaction'].get('subtype', '') == 'LIFE_SALE' else details['transaction'].get('subtype', 'N/A'))
+            print("Number of rooms:", details['property'].get('bedroomCount', 'N/A'))
+            print("Living area:", details['property'].get('netHabitableSurface', 'N/A'), "m²")
+            print("Furnished:", 1 if details['transaction'].get('sale', {}).get('isFurnished', False) else 0)
+            print("Open fire:", 1 if details['property'].get('fireplaceExists', False) else 0)
+            print("Terrace:", details['property'].get('terraceSurface', 'null'), "m²" if details['property'].get('terraceSurface', False) else '')
+            print("Garden:", details['property'].get('gardenSurface', 'null'), "m²" if details['property'].get('gardenSurface', False) else '')
+            print("Swimming pool:", 1 if details['property'].get('hasSwimmingPool', False) else 0)
+            #print("State of building:", details['property'].get('building', {}).get('condition', 'N/A'))
+            #print("Surface of good:", details['property'].get('land', {}).get('surface', 'N/A'), "m²")
+            #print("Number of facades:", details['property'].get('building', {}).get('facadeCount', 'N/A'))
+            print("--------")
 
-        classified_data = json.loads(json_string)
-        #print(classified_data)
-        break
+            # Collect data for CSV
+            all_property_data.append(details)
 
-print("Property ID:", classified_data['id'])
+    # Save the collected data to CSV
+    to_csv(all_property_data, 'property_data.csv')
+    print("Results saved to property_data.csv")
 
-my_dict = classified_data['property']
+if __name__ == "__main__":
+    main()
 
-location = my_dict.get('location', {})
-locality = location.get('locality', 'Default Value')
-print("Locality name:", locality)
-
-postalCode = my_dict['location']['postalCode']
-print("Postal code:", postalCode)
-
-living_area = my_dict['netHabitableSurface']
-print("Living area:", living_area)
-
-kitchen = my_dict['kitchen']
-if kitchen:
-    print("Equipped kitchen:", 1)
-else:
-    print("Equipped kitchen:", 0)
-
-fireplaceCount = my_dict['fireplaceCount']
-if fireplaceCount:
-    print("Open fire:", 1)
-else:
-    print("Open fire:", 0)
-
-terraceSurface = my_dict['terraceSurface']
-if terraceSurface:
-    print("Terrace:", terraceSurface)
-else:
-    print("Terrace:", 0)
-
-gardenSurface = my_dict['gardenSurface']
-if gardenSurface:
-    print("Garden:", gardenSurface)
-else:
-    print("Garden:", 0)
-
-netHabitableSurface = my_dict['netHabitableSurface']
-if netHabitableSurface:
-    print("Living area in m²:", netHabitableSurface)
-else:
-    print("Living area not found")
-
-hasSwimmingPool = my_dict['hasSwimmingPool']
-if hasSwimmingPool:
-    print("Swimming pool:", 1)
-else:
-    print("Swimming pool:", 0)
-
-property_type = classified_data['property']['type']
-print(f"Type of Property: {property_type}")
-
-number_of_rooms = classified_data['property'].get('bedroomCount', 0)
-print(f"Number of Rooms: {number_of_rooms}")
-
-furnished = 1 if classified_data['transaction'].get('sale', {}).get('isFurnished', False) else 0
-print(f"Furnished: {furnished}")
-
-sale_type = classified_data['transaction']['subtype'] if classified_data['transaction']['subtype'] != 'LIFE_SALE' else None
-print(f"Type of Sale: {sale_type}")
-
-price = classified_data['transaction']['sale']['price']
-print(f"Price: {price}")
