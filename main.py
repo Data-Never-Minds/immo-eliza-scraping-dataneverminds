@@ -26,7 +26,7 @@ def get_link(url):
     return soup
 
 
-for x in range(1, 3):
+for x in range(1, 2):
     time.sleep(0.2)
     for a in get_link(f'https://www.immoweb.be/en/search/house/for-sale?countries=BE&page={x}&orderBy=relevance').find_all('a', attrs={"class": "card__title-link"}):
         url_list.append(a.get("href"))
@@ -69,8 +69,27 @@ for url in url_list:
 
     kitchen = my_dict.get('kitchen')
     kitchen_qnt = 1 if kitchen else 0
-
     print("Equipped kitchen:", kitchen_qnt)
+
+    if kitchen:
+        kitchen_surface = kitchen.get('surface')
+        print(kitchen_surface)
+        kitchen_type = kitchen.get('type')
+        print(kitchen_type)
+        kitchen_oven = kitchen.get('hasOven')
+        print(kitchen_oven)
+        kitchen_micro_wave = kitchen.get('hasMicroWaveOven')
+        print(kitchen_micro_wave)
+        kitchen_dish_washer = kitchen.get('hasDiswasher')
+        print(kitchen_dish_washer)
+        kitchen_machine = kitchen.get('hasWashingMachine')
+        print(kitchen_machine)
+        kitchen_fridge = kitchen.get('hasFridge')
+        print(kitchen_fridge)
+        kitchen_freezer = kitchen.get('hasFreezer')
+        print(kitchen_freezer)
+        kitchen_steam_oven = kitchen.get('hasSteamOven')
+        print(kitchen_steam_oven)
 
     fireplaceCount = my_dict['fireplaceCount']
     open_fire = 1 if fireplaceCount else 0
@@ -127,7 +146,20 @@ for url in url_list:
         "Garden": gardenSurface,
         "Living area in m²:": netHabitableSurface,
         "Swimming pool": hasSwimmingPool,
+
     }
+
+    if kitchen:
+        dict['kitchenSurface'] = kitchen_surface
+        dict['kitchenType'] = kitchen_type
+        dict['kitchenOven'] = kitchen_oven
+        dict['kitchenMicroWave'] = kitchen_micro_wave
+        dict['kitchenDishWasher'] = kitchen_dish_washer
+        dict['kitchenWashingMachine'] = kitchen_machine
+        dict['kitchenFridge'] = kitchen_fridge
+        dict['kitchenFreezer'] = kitchen_freezer
+        dict['kitchenSteamOven'] = kitchen_steam_oven
+
     all_Information.append(dict)
 
 
