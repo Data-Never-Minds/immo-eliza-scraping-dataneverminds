@@ -42,7 +42,7 @@ def get_links_concurrently(base_url, pages=15):
         return links
 
     url_list = []
-    with ThreadPoolExecutor(max_workers=5) as executor:
+    with ThreadPoolExecutor(max_workers=10) as executor:
         # Submit all pages to be fetched concurrently
         future_to_page = {executor.submit(
             fetch_links_from_page, page): page for page in range(1, pages + 1)}
@@ -61,7 +61,7 @@ def get_links_concurrently(base_url, pages=15):
 
 def fetch_details_concurrently(url_list):
     """Fetch property details for a list of URLs concurrently."""
-    with ThreadPoolExecutor(max_workers=10000) as executor:
+    with ThreadPoolExecutor(max_workers=10) as executor:
         start = time.time()
         futures = {executor.submit(
             get_property_details, url): url for url in url_list}
