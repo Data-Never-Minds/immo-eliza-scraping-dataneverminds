@@ -11,7 +11,7 @@ def main():
     base_url = 'https://www.immoweb.be/en/search/house/for-sale?countries=BE&page={}&orderBy=relevance'
 
     # Fetch property links
-    url_list = get_links_concurrently(base_url, pages=15)
+    url_list = get_links_concurrently(base_url, pages=5)
 
     # Fetch details concurrently for the collected URLs
     print("Fetching details for collected properties...")
@@ -38,8 +38,16 @@ def main():
                 "Terrace Surface": f"{details['property'].get('terraceSurface', 'null')}" if details['property'].get('terraceSurface', False) else 0,
                 "Garden Surface": f"{details['property'].get('gardenSurface', 'null')}" if details['property'].get('gardenSurface', False) else 0,
                 "Swimming pool": 1 if details['property'].get('hasSwimmingPool', False) else 0,
-                "Kitchen": 1 if details['property'].get('kitchen') else 0
+                "Kitchen": 1 if details['property'].get('kitchen') else 0,
+                "Toilets": details['property']['toiletCount']
             }
+
+            if details['property']:
+                details_property = details['property']
+                if details_property.get('building') and details_property['building'].get('condition'):
+                    condition_building = details_property['building'].get(
+                        'condition')
+                    property_dict["Building State"] = condition_building
 
             property_type = details['property'].get('type')
             if property_type != 'HOUSE_GROUP':
