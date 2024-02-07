@@ -1,4 +1,3 @@
-
 ## Description
 This is a machine learning model to make price predictions on real estate sales in Belgium.
 The program does the following:
@@ -32,3 +31,4 @@ Open ```cmd``` if on windows and move into the immo-eliza-scraping-datanevermind
 ```python3 main.py```
 
 ## Visuals
+

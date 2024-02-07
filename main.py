@@ -18,18 +18,24 @@ def to_csv(data: dict, save='data.csv') -> None:
         return None
 
 
-def get_link(url):
+url = "https://www.immoweb.be/fr/annonce/maison/a-vendre/ixelles/1050/11075842"
+r = requests.get(url)
+c = r.content
+# print(r.status_code)
 
-    r = requests.get(url)
-    soup = BeautifulSoup(r.content, "lxml")
+soup = BeautifulSoup(c, "html.parser")
 
-    return soup
+script_tags = soup.find_all("script", attrs={"type": "text/javascript"})
 
+for script in script_tags:
+    if "window.classified" in script.get_text():
+        script_text = script.get_text()
+        json_string = script_text.split('window.classified = ', 1)[1]
+        json_string = json_string.rsplit(';', 1)[0]
 
-for x in range(1, 2):
-    time.sleep(0.2)
-    for a in get_link(f'https://www.immoweb.be/en/search/house/for-sale?countries=BE&page={x}&orderBy=relevance').find_all('a', attrs={"class": "card__title-link"}):
-        url_list.append(a.get("href"))
+        classified_data = json.loads(json_string)
+        # print(classified_data)
+        break
 
 
 for url in url_list:
@@ -60,12 +66,43 @@ for url in url_list:
     location = my_dict.get('location', {})
     locality = location.get('locality', 'Default Value')
     print("Locality name:", locality)
-
-    postalCode = my_dict['location']['postalCode']
-    print("Postal code:", postalCode)
-
-    living_area = my_dict['netHabitableSurface']
-    print("Living area:", living_area)
+    if not location == {}:
+        postalCode = my_dict['location']['postalCode']
+        print("Postal code:", postalCode)
+        country = my_dict['lacation']['country']
+        print('Country: ', country)
+        region = my_dict['location']['region']
+        print('Region:', region)
+        province = my_dict['location']['province']
+        print('Province: ', province)
+        street = my_dict['location']['street']
+        print('Street:', street)
+        number_house = my_dict['location']['number']
+        print('Number: ', number_house)
+        box = my_dict['location']['box']
+        print("Box: ", box)
+        property_name = my_dict['location']['propertyName']
+        print("Property Name: ", property_name)
+        floor = my_dict['location']['floor']
+        print('Floor: ', floor)
+        latitude = my_dict['location']['latitude']
+        print('Latitude: ', latitude)
+        longitude = my_dict['location']['longitude']
+        print('Longitude: ', longitude)
+        distance = my_dict['location']['distance']
+        print("Distance: ", distance)
+        aproximated = my_dict['location']['aproximated']
+        print('Aproximated: ', aproximated)
+        region_code = my_dict['location']['regionCode']
+        print('Region Code:', region_code)
+        type_residence = my_dict['location']['type']
+        print('type of Residence: ', type_residence)
+        district = my_dict['location']['district']
+        print("District: ", district)
+        living_area = my_dict['netHabitableSurface']
+        print("Living area:", living_area)
+        sea_view = my_dict['location']['hasSeaView']
+        print('Has Sea View:', sea_view)
 
     kitchen = my_dict.get('kitchen')
     kitchen_qnt = 1 if kitchen else 0
@@ -130,6 +167,9 @@ for url in url_list:
     price = classified_data['transaction']['sale']['price']
     print(f"Price: {price}")
 
+    if my_dict.get('basemant'):
+        print("Basement: ", my_dict['basemant']['surface'])
+
     dict = {
         "Property ID": classified_data_id,
         "Locality name": locality,
@@ -159,6 +199,26 @@ for url in url_list:
         dict['kitchenFridge'] = kitchen_fridge
         dict['kitchenFreezer'] = kitchen_freezer
         dict['kitchenSteamOven'] = kitchen_steam_oven
+
+    if not location == {}:
+        dict['Postal code'] = postalCode
+        dict['Country'] = country
+        dict['Region'] = region
+        dict['Province'] = province
+        dict['Street'] = street
+        dict['Number'] = number_house
+        dict['Box'] = box
+        dict['PropertyName'] = property_name
+        dict['Floor'] = floor
+        dict['Latitude'] = latitude
+        dict['Longitude'] = longitude
+        dict['Distance'] = distance
+        dict['Aproximated'] = aproximated
+        dict['RegionCode'] = region_code
+        dict['typeofResidence'] = type_residence
+        dict['District'] = district
+        dict['Livingarea'] = living_area
+        dict['HasSeaView'] = sea_view
 
     all_Information.append(dict)
 
