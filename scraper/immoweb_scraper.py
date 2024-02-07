@@ -6,15 +6,31 @@ from .utils import get_soup
 import time
 
 
-def get_links(base_url, pages):
-    """Fetch property links from multiple pages."""
+def get_links_concurrently(base_url, pages=10):
+    """Fetch property links from multiple pages concurrently."""
+    def fetch_links_from_page(page_number):
+        """Function to fetch links from a single page."""
+        page_url = base_url.format(page_number)
+        soup = get_soup(page_url)
+        links = [a.get("href") for a in soup.find_all(
+            'a', attrs={"class": "card__title-link"})]
+        return links
+
     url_list = []
-    for x in range(1, pages+1):
-        print(f"Extracting URLs from Page {x}")
-        full_url = base_url.format(x)
-        soup = get_soup(full_url)
-        for a in soup.find_all('a', attrs={"class": "card__title-link"}):
-            url_list.append(a.get("href"))
+    with ThreadPoolExecutor(max_workers=15) as executor:
+        # Submit all pages to be fetched concurrently
+        future_to_page = {executor.submit(
+            fetch_links_from_page, page): page for page in range(1, pages + 1)}
+
+        for future in as_completed(future_to_page):
+            page = future_to_page[future]
+            try:
+                page_links = future.result()
+                url_list.extend(page_links)
+                print(f"Extracted URLs from Page {page}")
+            except Exception as exc:
+                print(f"Page {page} generated an exception: {exc}")
+
     return url_list
 
 
@@ -61,8 +77,7 @@ def get_links_concurrently(base_url, pages=15):
 
 def fetch_details_concurrently(url_list):
     """Fetch property details for a list of URLs concurrently."""
-    with ThreadPoolExecutor(max_workers=10) as executor:
-        start = time.time()
+    with ThreadPoolExecutor(max_workers=15) as executor:
         futures = {executor.submit(
             get_property_details, url): url for url in url_list}
         results = []
@@ -72,6 +87,4 @@ def fetch_details_concurrently(url_list):
                 results.append(data)
             except Exception as exc:
                 print('%r generated an exception: %s' % (futures[future], exc))
-        end = time.time()
-        print("Time Taken: {:.6f}s".format(end-start))
     return results
