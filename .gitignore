@@ -1,4 +1,5 @@
 venv/
+<<<<<<< HEAD
 Eliza/
 get_details
 immodetails.ipynb
@@ -6,3 +7,7 @@ immogetdetails.ipynb
 immosel.ipynb
 notes.json
 page1
+=======
+__pycache__/
+*.pyc
+>>>>>>> 239291284bd7355629f507495f9f4df97164fa93
