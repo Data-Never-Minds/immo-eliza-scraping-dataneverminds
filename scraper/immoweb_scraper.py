@@ -1,6 +1,6 @@
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
-from .utils import get_soup
+from .utils import get_soup, get_max_workers
 
 
 def get_links_concurrently(base_url, pages=10):
@@ -15,7 +15,7 @@ def get_links_concurrently(base_url, pages=10):
 
     url_list = []
 
-    with ThreadPoolExecutor(max_workers=16) as executor:
+    with ThreadPoolExecutor(max_workers=get_max_workers()) as executor:
         # Submit all pages to be fetched concurrently
         future_to_page = {executor.submit(
             fetch_links_from_page, page): page for page in range(1, pages + 1)}
@@ -56,7 +56,7 @@ def get_links_concurrently(base_url, pages=15):
         return links
 
     url_list = []
-    with ThreadPoolExecutor(max_workers=16) as executor:
+    with ThreadPoolExecutor(max_workers=32) as executor:
         # Submit all pages to be fetched concurrently
         future_to_page = {executor.submit(
             fetch_links_from_page, page): page for page in range(1, pages + 1)}
@@ -75,7 +75,7 @@ def get_links_concurrently(base_url, pages=15):
 
 def fetch_details_concurrently(url_list):
     """Fetch property details for a list of URLs concurrently."""
-    with ThreadPoolExecutor(max_workers=16) as executor:
+    with ThreadPoolExecutor(max_workers=32) as executor:
         futures = {executor.submit(
             get_property_details, url): url for url in url_list}
         results = []
@@ -83,6 +83,7 @@ def fetch_details_concurrently(url_list):
             try:
                 data = future.result()
                 results.append(data)
+                print(f"Extracted {data}")
             except Exception as exc:
                 print('%r generated an exception: %s' % (futures[future], exc))
     return results

@@ -37,23 +37,40 @@ def process_property_detail(detail):
                     "Subtype of property": detail['property'].get('subtype', 'N/A'),
                     "Type of sale": "N/A" if detail['transaction'].get('subtype', '') == 'LIFE_SALE' else detail['transaction'].get('subtype', 'N/A'),
                     "Number of Rooms": f"{detail['property'].get('bedroomCount', '0')}" if detail['property'].get('bedroomCount', '0') else 0,
-                    "Living area": f"{detail['property'].get('netHabitableSurface', '0')}" if detail['property'].get('netHabitableSurface', '0') else 0,
+                    "Living area": f"{detail['property'].get('netHabitableSurface', 'None')}" if detail['property'].get('netHabitableSurface', '0') else 'None',
                     "Furnished": 1 if detail['transaction'].get('sale', {}).get('isFurnished', False) else 0,
                     "Open fire": 1 if detail['property'].get('fireplaceExists', False) else 0,
-                    "Terrace Surface": f"{detail['property'].get('terraceSurface', 'null')}" if detail['property'].get('terraceSurface', False) else 0,
-                    "Garden Surface": f"{detail['property'].get('gardenSurface', 'null')}" if detail['property'].get('gardenSurface', False) else 0,
+                    "Terrace Surface": f"{detail['property'].get('terraceSurface', 'null')}" if detail['property'].get('terraceSurface', False) else 'None',
+                    "Garden Surface": f"{detail['property'].get('gardenSurface', 'null')}" if detail['property'].get('gardenSurface', False) else 'None',
                     "Swimming pool": 1 if detail['property'].get('hasSwimmingPool', False) else 0,
-                    "Kitchen": 1 if detail['property'].get('kitchen') else 0,
-                    "Toilets": detail['property']['toiletCount'],
-                    "Number of facades": detail['property'].get('building', {}).get('facadeCount', 0) if detail['property'].get('building') else 0,
-                    "Building State": detail['property'].get('building', {}).get('condition') if detail['property'].get('building') and detail['property']['building'].get('condition') else 'None'
+
+                    "Toilets": f"{detail['property']['toiletCount']}" if detail['property']['toiletCount'] else 'None',
+                    "Surface of good": f"{detail['property'].get('land', 'None').get('surface', 'None')}" if detail['property'].get('land') else 'None',
+                    "Number of facades": f"{detail['property'].get('building', {}).get('facadeCount', 'None')}" if detail['property'].get('building') else 'None',
+                    "Building State": detail['property'].get('building', 'None').get('condition') if detail['property'].get('building') and detail['property']['building'].get('condition') else 'None',
+                    "kitchen": 1 if detail['property'].get('kitchen') else 0,
                 }
-                # If not 'GROUP_HOUSE', add the details to all_property_data
+                if detail['property']['kitchen']:
+                    kitchen = detail['property']['kitchen']
+                    if kitchen['type']:
+                        data = kitchen['type']
+                        if not data or data == "NOT_INSTALLED":
+                            property_dict['Kitchen'] = 0
+                            property_dict['Kitchen_type'] = 'None'
+                        else:
+                            property_dict['Kitchen'] = 1
+                            property_dict['Kitchen_type'] = data
+
                 return property_dict
     return None
 
 
-def process_details_concurrently(property_details_list, max_workers=16):
+def get_max_workers():
+    executor = ThreadPoolExecutor()
+    return executor._max_workers
+
+
+def process_details_concurrently(property_details_list, max_workers=get_max_workers()):
     """Process property details concurrently using threading."""
     all_property_data = []
 
