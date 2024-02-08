@@ -4,11 +4,20 @@ import time
 
 
 def main():
+    """
+    Main function to scrape real estate property data from the Immoweb website.
+
+    Steps:
+    1. Collect property links concurrently from multiple pages.
+    2. Fetch details for the collected property URLs concurrently.
+    3. Process the fetched property details concurrently, preparing data for CSV output.
+    4. Save the processed data into a CSV file.
+    """
     start = time.time()
     base_url = 'https://www.immoweb.be/en/search/house/for-sale?countries=BE&page={}&orderBy=relevance'
 
     # Fetch property links
-    url_list = get_links_concurrently(base_url, pages=2)
+    url_list = get_links_concurrently(base_url, pages=333)
 
     # Fetch details concurrently for the collected URLs
     print("Fetching details for collected properties...")
