@@ -1,10 +1,23 @@
 venv/
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
 __pycache__/
 *.pyc
+>>>>>>> 25c39a9706503e55f914f55895c51aaff1fd5ad1
 Eliza/
 get_details
 immodetails.ipynb
 immogetdetails.ipynb
 immosel.ipynb
 notes.json
+property_data.csv
 page1
+vscode
+<<<<<<< HEAD
+=======
+__pycache__/
+*.pyc
+>>>>>>> 239291284bd7355629f507495f9f4df97164fa93
+=======
+>>>>>>> 25c39a9706503e55f914f55895c51aaff1fd5ad1
