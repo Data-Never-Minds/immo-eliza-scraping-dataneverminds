@@ -1,37 +1,27 @@
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
+import pandas as pd
 from .utils import get_soup, get_max_workers
 
 
-def get_links_concurrently(base_url, pages=10):
+def get_links_concurrently(base_url, pages=333):
     """
     Fetch property links from multiple pages concurrently using a thread pool.
 
-    Args:
-        base_url (str): The base URL to format with page numbers.
-        pages (int): Total number of pages to fetch.
-
-    Returns:
-        list: A list of URLs extracted from all the pages.
     """
+    url_list = []
+
     def fetch_links_from_page(page_number):
         """
         Fetch links from a single page by formatting the base_url with the page_number,
         parsing the page with BeautifulSoup, and extracting all links with a specific class.
 
-        Args:
-            page_number (int): The number of the page to fetch links from.
-
-        Returns:
-            list: A list of URLs found on the page.
         """
         page_url = base_url.format(page_number)
         soup = get_soup(page_url)
         links = [a.get("href") for a in soup.find_all(
             'a', attrs={"class": "card__title-link"})]
         return links
-
-    url_list = []
 
     with ThreadPoolExecutor(max_workers=get_max_workers()) as executor:
         # Submit all pages to be fetched concurrently
@@ -47,7 +37,8 @@ def get_links_concurrently(base_url, pages=10):
             except Exception as exc:
                 print(f"Page {page} generated an exception: {exc}")
 
-    return url_list
+    print(list(set(url_list)))
+    return list(set(url_list))
 
 
 def get_property_details(url):
@@ -85,13 +76,10 @@ def fetch_details_concurrently(url_list):
         futures = {executor.submit(
             get_property_details, url): url for url in url_list}
         results = []
-        counter = 0
         for future in futures:
             try:
                 data = future.result()
                 results.append(data)
-                counter += 1
-                print(f"Extracted {counter}")
             except Exception as exc:
                 print('%r generated an exception: %s' % (futures[future], exc))
     return results

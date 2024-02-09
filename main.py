@@ -29,7 +29,7 @@ def main():
         property_details_list, max_workers=get_max_workers())
 
     # Save the collected data to CSV
-    to_csv(all_property_data, '.\data\property_data.csv')
+    to_csv(all_property_data, 'property_data.csv')
     print("Results saved to property_data.csv")
 
     end = time.time()
