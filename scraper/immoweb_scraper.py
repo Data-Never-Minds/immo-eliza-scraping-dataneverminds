@@ -85,11 +85,13 @@ def fetch_details_concurrently(url_list):
         futures = {executor.submit(
             get_property_details, url): url for url in url_list}
         results = []
+        counter = 0
         for future in futures:
             try:
                 data = future.result()
                 results.append(data)
-                print(f"Extracted {data}")
+                counter += 1
+                print(f"Extracted {counter}")
             except Exception as exc:
                 print('%r generated an exception: %s' % (futures[future], exc))
     return results
