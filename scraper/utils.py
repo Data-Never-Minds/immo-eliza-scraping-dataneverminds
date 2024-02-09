@@ -69,7 +69,6 @@ def process_property_detail(detail):
                     "Surface of good": f"{detail['property'].get('land', 'None').get('surface', 'None')}" if detail['property'].get('land') else 'None',
                     "Number of facades": f"{detail['property'].get('building', {}).get('facadeCount', 'None')}" if detail['property'].get('building') else 'None',
                     "Building State": detail['property'].get('building', 'None').get('condition') if detail['property'].get('building') and detail['property']['building'].get('condition') else 'None',
-                    # "kitchen": 1 if detail['property'].get('kitchen') else 0,
                 }
                 if detail['property']['kitchen']:
                     kitchen = detail['property']['kitchen']

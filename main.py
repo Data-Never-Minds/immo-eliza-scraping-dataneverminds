@@ -17,7 +17,7 @@ def main():
     base_url = 'https://www.immoweb.be/en/search/house/for-sale?countries=BE&page={}&orderBy=relevance'
 
     # Fetch property links
-    url_list = get_links_concurrently(base_url, pages=333)
+    url_list = get_links_concurrently(base_url, pages=33)
 
     # Fetch details concurrently for the collected URLs
     print("Fetching details for collected properties...")
@@ -29,7 +29,7 @@ def main():
         property_details_list, max_workers=get_max_workers())
 
     # Save the collected data to CSV
-    to_csv(all_property_data, 'property_data.csv')
+    to_csv(all_property_data, '.\data\property_data.csv')
     print("Results saved to property_data.csv")
 
     end = time.time()

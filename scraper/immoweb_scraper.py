@@ -81,7 +81,7 @@ def fetch_details_concurrently(url_list):
     Returns:
         list: A list of dictionaries, each containing the details of a property.
     """
-    with ThreadPoolExecutor(max_workers=get_max_workers) as executor:
+    with ThreadPoolExecutor(max_workers=get_max_workers()) as executor:
         futures = {executor.submit(
             get_property_details, url): url for url in url_list}
         results = []
