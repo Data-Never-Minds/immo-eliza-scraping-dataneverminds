@@ -17,7 +17,7 @@ def main():
     base_url = 'https://www.immoweb.be/en/search/house/for-sale?countries=BE&page={}&orderBy=relevance'
 
     # Fetch property links
-    url_list = get_links_concurrently(base_url, pages=33)
+    url_list = get_links_concurrently(base_url, pages=333)
 
     # Fetch details concurrently for the collected URLs
     print("Fetching details for collected properties...")
