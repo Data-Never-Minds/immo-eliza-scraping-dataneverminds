@@ -13,6 +13,40 @@ map = folium.Map(location=[50.850346, 4.351721], zoom_start=10)
 for index, row in data.iterrows():
     if row['Province'] == 'Brussels':
         if pd.notna(row['Latitude']) and pd.notna(row['Longitude']):
+            color = 'black'
+            icon = 'house'
+            if row['Price'] <= 800000:
+                color = 'red'
+            if row['Price'] <= 600000:
+                color = 'orange'
+            if row['Price'] <= 400000:
+                color = 'green'
+
+            if row['Type of property'] == 'APARTMENT':
+                icon = 'building'
+
+            coords = [row['Latitude'], row['Longitude']]
+            folium.Marker(coords, tooltip="Click for More", popup=(f"Price:{row['Price']}"
+                                                                   f"\nEnergy:{row['Energy Level']}"
+                                                                   f"\nPostal:{row['Postal code']}"
+                                                                   f"\nRoom:{row['Number of Rooms']}"
+                                                                   f"\nSurface:{row['Surface of good']}"
+                                                                   f"\nTaxes:{row['Taxes Year']}"),
+                          icon=folium.Icon(icon=icon, prefix='fa', color=color)).add_to(map)
+
+            last_location_add = row['Latitude'], row['Longitude']
+
+map.location = last_location_add
+map.show_in_browser()
+
+
+'''
+map = folium.Map(location=[50.850346, 4.351721], zoom_start=10)
+
+
+for index, row in data.iterrows():
+    if row['Province'] == 'Brussels':
+        if pd.notna(row['Latitude']) and pd.notna(row['Longitude']):
             if row['Price'] <= 400000:
                 if row['Type of property'] == 'APARTMENT':
                     coords = [row['Latitude'], row['Longitude']]
@@ -99,6 +133,7 @@ for index, row in data.iterrows():
                 last_location_add = row['Latitude'], row['Longitude']
 map.location = last_location_add
 map.show_in_browser()
+'''
 
 
 '''
