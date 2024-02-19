@@ -24,4 +24,4 @@ Open ```cmd``` if on windows and move into the immo-eliza-scraping-datanevermind
 ```python3 main.py```
 
 ## Visuals
-![property_data](data-never-minds.webp)
+![property_data](data-never-minds.png)
