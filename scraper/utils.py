@@ -67,8 +67,8 @@ def process_property_detail(detail):
 
                     "Toilets": f"{detail['property']['toiletCount']}" if detail['property']['toiletCount'] else 'None',
                     "Surface of good": f"{detail['property'].get('land', 'None').get('surface', 'None')}" if detail['property'].get('land') else 'None',
-                    "Number of facades": f"{detail['property'].get('building', {}).get('facadeCount', 'None')}" if detail['property'].get('building') else 'None',
-                    "Building State": detail['property'].get('building', 'None').get('condition') if detail['property'].get('building') and detail['property']['building'].get('condition') else 'None',
+                    "Number of facades": f"{detail['property'].get('location', {}).get('facadeCount', 'None')}" if detail['property'].get('location') else 'None',
+                    "location State": detail['property'].get('location', 'None').get('condition') if detail['property'].get('location') and detail['property']['location'].get('condition') else 'None',
                 }
                 if detail['property']['kitchen']:
                     kitchen = detail['property']['kitchen']
@@ -86,7 +86,54 @@ def process_property_detail(detail):
                 else:
                     property_dict['Kitchen_type'] = 'None'
                     property_dict['Kitchen'] = 0
+
+                if detail['property']['location']:
+                    location = detail['property']['location']
+                    property_dict['Country'] = location.get(
+                        'country') if location.get('country') else 'None'
+                    property_dict['Region'] = location.get(
+                        'region') if location.get('region') else 'None'
+                    property_dict['Province'] = location.get(
+                        'province')if location.get('province') else 'None'
+                    property_dict['District'] = location.get(
+                        'district')if location.get('district') else 'None'
+                    property_dict['Locality'] = location.get(
+                        'locality')if location.get('locality') else 'None'
+                    property_dict['Street'] = location.get(
+                        'street')if location.get('street') else 'None'
+                    property_dict['Number House'] = location.get(
+                        'number')if location.get('number') else 'None'
+                    property_dict['Latitude'] = location.get(
+                        'latitude')if location.get('latitude') else 'None'
+                    property_dict['Longitude'] = location.get(
+                        'longitude')if location.get('longitude') else 'None'
+                else:
+                    property_dict.update({
+                        'Country': 'None', 'Region': 'None', 'Province': 'None', 'District': 'None',
+                        'Locality': 'None', 'Street': 'None', 'Number House': 'None',
+                        'Latitude': 'None', 'Longitude': 'None'
+                    })
+
+                if detail['transaction']['certificates']:
+                    certificates = detail['transaction']['certificates']
+                    if certificates['epcScore']:
+                        property_dict['Energy Level'] = certificates['epcScore']
+                    else:
+                        property_dict['Energy Level'] = 'None'
+                else:
+                    property_dict['Energy Level'] = 'None'
+
+                if detail['transaction']['sale']:
+                    sales = detail['transaction']['sale']
+                    if sales['cadastralIncome']:
+                        property_dict['Taxes Year'] = sales['cadastralIncome']
+                    else:
+                        property_dict['Taxes Year'] = 'None'
+                else:
+                    property_dict['Taxes Year'] = 'None'
+
                 return property_dict
+
     return None
 
 

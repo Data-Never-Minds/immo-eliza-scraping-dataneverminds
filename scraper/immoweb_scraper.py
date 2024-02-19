@@ -1,7 +1,7 @@
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
-import pandas as pd
 from .utils import get_soup, get_max_workers
+import scrapy
 
 
 def get_links_concurrently(base_url, pages=333):
